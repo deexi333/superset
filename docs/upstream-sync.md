@@ -38,7 +38,8 @@ Protect `main` with required PRs and the `Upstream sync tests`, `Lint`, `Test`, 
 `Typecheck` checks. Keep merge commits enabled and linear-history enforcement off.
 Auto-merge should remain disabled until the fork's deployment and release configuration
 has been reviewed: inherited workflows include production migrations and deployments.
-The fork needs its own CI configuration; deployment credentials are not copied from upstream.
+The inherited preview, production, sandbox, and canary jobs only run in
+`superset-sh/superset`; deployment credentials are not copied from upstream.
 
 ## Reviewing updates
 
