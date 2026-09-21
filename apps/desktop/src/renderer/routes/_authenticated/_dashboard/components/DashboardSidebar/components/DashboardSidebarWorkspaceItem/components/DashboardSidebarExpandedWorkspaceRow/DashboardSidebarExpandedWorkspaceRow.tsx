@@ -14,7 +14,6 @@ import {
 	useEffect,
 	useId,
 	useRef,
-	useState,
 } from "react";
 import { HiCheck, HiMiniXMark } from "react-icons/hi2";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
@@ -25,6 +24,7 @@ import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
+import { useSidebarAgentExpansion } from "renderer/stores/sidebar-agent-expansion";
 import { useWorkspaceAgentsRowEnabled } from "renderer/stores/workspace-agents-row";
 import type { ActivePaneStatus } from "shared/tabs-types";
 import type {
@@ -120,7 +120,8 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		ref,
 	) => {
 		const { t } = useLingui();
-		const [agentsExpanded, setAgentsExpanded] = useState(true);
+		const { expanded: agentsExpanded, toggle: toggleAgents } =
+			useSidebarAgentExpansion([workspace.id, "workspace"]);
 		const agentsRegionId = useId();
 		const agentsEnabled = useWorkspaceAgentsRowEnabled();
 		const runningAgents = useDashboardSidebarWorkspaceRunningAgents(
@@ -229,7 +230,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							onDoubleClick={(event) => event.stopPropagation()}
 							onClick={(event) => {
 								event.stopPropagation();
-								setAgentsExpanded((expanded) => !expanded);
+								toggleAgents();
 							}}
 							className={cn(
 								"absolute flex size-4 items-center justify-center rounded-sm text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",

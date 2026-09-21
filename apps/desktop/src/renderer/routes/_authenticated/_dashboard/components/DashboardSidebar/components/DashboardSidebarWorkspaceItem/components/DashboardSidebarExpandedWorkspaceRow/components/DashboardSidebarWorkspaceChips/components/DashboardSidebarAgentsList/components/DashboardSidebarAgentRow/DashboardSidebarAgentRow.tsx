@@ -20,6 +20,7 @@ import {
 	navigateToV2Workspace,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
+import { useSidebarAgentExpansion } from "renderer/stores/sidebar-agent-expansion";
 import type {
 	DashboardSidebarRunningAgent,
 	DashboardSidebarRunningSubagent,
@@ -50,7 +51,8 @@ export function DashboardSidebarAgentRow({
 	const navigate = useNavigate();
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const queryClient = useQueryClient();
-	const [subagentsExpanded, setSubagentsExpanded] = useState(true);
+	const { expanded: subagentsExpanded, toggle: toggleSubagents } =
+		useSidebarAgentExpansion([workspaceId, "subagents", agent.sourceKey]);
 	const [isStopping, setIsStopping] = useState(false);
 	const [renamingSubagent, setRenamingSubagent] =
 		useState<DashboardSidebarRunningSubagent | null>(null);
@@ -172,7 +174,7 @@ export function DashboardSidebarAgentRow({
 						type="button"
 						onClick={(event) => {
 							event.stopPropagation();
-							setSubagentsExpanded((expanded) => !expanded);
+							toggleSubagents();
 						}}
 						aria-label={
 							subagentsExpanded

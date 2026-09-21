@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { AGENT_IDENTITY_LABELS } from "@superset/shared/agent-catalog";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useSidebarAgentExpansionStore } from "renderer/stores/sidebar-agent-expansion";
 import type { DashboardSidebarRunningAgent } from "../../hooks/useDashboardSidebarWorkspaceRunningAgents";
 import { DashboardSidebarAgentAvatar } from "./components/DashboardSidebarAgentAvatar";
 import { DashboardSidebarAgentRow } from "./components/DashboardSidebarAgentRow";
@@ -16,9 +17,10 @@ export function DashboardSidebarAgentsList({
 	agents,
 }: DashboardSidebarAgentsListProps) {
 	const { t } = useLingui();
-	const [collapsedModelIds, setCollapsedModelIds] = useState<Set<string>>(
-		() => new Set(),
+	const collapsedGroups = useSidebarAgentExpansionStore(
+		(state) => state.collapsed,
 	);
+	const toggleGroup = useSidebarAgentExpansionStore((state) => state.toggle);
 	const modelGroups = useMemo(() => {
 		const groups = new Map<
 			string,
@@ -46,15 +48,6 @@ export function DashboardSidebarAgentsList({
 		return [...groups.values()];
 	}, [agents]);
 
-	const toggleModel = (modelId: string) => {
-		setCollapsedModelIds((previous) => {
-			const next = new Set(previous);
-			if (next.has(modelId)) next.delete(modelId);
-			else next.add(modelId);
-			return next;
-		});
-	};
-
 	return (
 		<ul
 			aria-label={t({ message: "Agents" })}
@@ -72,14 +65,16 @@ export function DashboardSidebarAgentsList({
 					);
 				}
 
-				const collapsed = collapsedModelIds.has(group.modelId);
+				const collapsed = collapsedGroups.has(
+					JSON.stringify([workspaceId, "model", group.modelId]),
+				);
 				return (
 					<li key={group.modelId} className="min-w-0">
 						<button
 							type="button"
 							onClick={(event) => {
 								event.stopPropagation();
-								toggleModel(group.modelId);
+								toggleGroup([workspaceId, "model", group.modelId]);
 							}}
 							onKeyDown={(event) => event.stopPropagation()}
 							aria-expanded={!collapsed}
